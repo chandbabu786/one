@@ -156,6 +156,7 @@ rbd_rm_r() {
     local rbd rbd_base children snaps
 
     rbd=$1
+    move_to_trash=$2
     rbd_base=${rbd%%@*}
 
     if [ "$rbd" != "$rbd_base" ]; then
@@ -174,7 +175,11 @@ rbd_rm_r() {
             rbd_rm_r $rbd@$snap
         done
 
-        $RBD rm $rbd
+        if [[ $move_to_trash =~ ^(yes|YES|true|TRUE)$ ]]; then
+            $RBD trash move $rbd
+        else
+            $RBD rm $rbd
+        fi
     fi
 }
 
